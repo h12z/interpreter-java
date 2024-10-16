@@ -5,9 +5,15 @@ public enum TokenType {
   KEYWORD,
   NAME,
   FUNCTION_NAME,
-  OP,
-  CP,
+  INT,
+  FLOAT,
+  PAREN,
   DOT,
-  BIN_OP
+  MATH_OP,
+  COMPARER,
+  SEMI,
+  STRING,
+  CHAR,
+  SET
 
 }

@@ -19,7 +19,7 @@
     },
     {
       "type": "command",
-      "name": "Command configuration",
+      "name": "Git Push",
       "program": "git",
       "args": [
         "push"

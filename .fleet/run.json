@@ -17,5 +17,13 @@
         "me.h12z.Main"
       ],
     },
+    {
+      "type": "command",
+      "name": "Command configuration",
+      "program": "git",
+      "args": [
+        "push"
+      ],
+    },
   ]
 }

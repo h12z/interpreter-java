@@ -44,7 +44,7 @@ public class AST {
 
     tokens.forEach(token -> {
 
-      if(token.type.equals(TokenType.SEMI)) {
+      if (token.type.equals(TokenType.SEMI)) {
 
         Token first = currentLine.getFirst();
 
@@ -56,7 +56,7 @@ public class AST {
 
               case "class" -> {
 
-                if(indent != 0) {
+                if (indent != 0) {
 
                   System.err.println("Sorry but you can't define classes inside methods or other classes");
                   System.exit(0);

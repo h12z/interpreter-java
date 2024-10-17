@@ -8,7 +8,7 @@ import java.util.List;
 public class HClass {
 
   List<Func> functions;
-  List<HType> types;
+  List<HType<?>> types;
   List<Action> actions;
 
 }

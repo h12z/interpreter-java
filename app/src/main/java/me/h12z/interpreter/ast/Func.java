@@ -9,7 +9,7 @@ import java.util.List;
 public class Func {
 
   HClass parent;
-  List<HType> types;
+  List<HType<?>> types;
   List<Container> containers;
   List<Action> actions;
 

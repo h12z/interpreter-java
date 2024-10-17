@@ -1,0 +1,21 @@
+{
+  "configurations": [
+    {
+      "type": "gradle",
+      "name": "Gradle Build",
+      "tasks": [
+        "shadowJar"
+      ],
+    },
+    {
+      "type": "command",
+      "name": "Java Run",
+      "program": "java",
+      "args": [
+        "-cp",
+        "app/build/libs/app.jar",
+        "me.h12z.Main"
+      ],
+    },
+  ]
+}

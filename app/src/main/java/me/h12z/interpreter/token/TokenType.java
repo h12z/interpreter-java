@@ -15,5 +15,5 @@ public enum TokenType {
   STRING,
   CHAR,
   SET
-
+  
 }

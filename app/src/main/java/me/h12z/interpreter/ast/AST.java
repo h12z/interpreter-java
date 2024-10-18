@@ -26,12 +26,6 @@ public class AST {
 
   }
 
-  private static boolean match(TokenType type) {
-
-    return getCurrent().type.equals(type);
-
-  }
-
   public static JsonObject toAST(List<Token> _tokens) {
 
     tokens = _tokens;
@@ -121,6 +115,10 @@ public class AST {
                 indent++;
 
               }
+
+            }
+
+            case "int" -> {
 
               
 

@@ -38,37 +38,91 @@ public class AST {
 
     JsonObject result = new JsonObject();
 
-    List<Token> currentLine = new Stack<>();
-
     int indent = 0;
 
-    tokens.forEach(token -> {
+    String currentPath = "";
 
-      if (token.type.equals(TokenType.SEMI)) {
+    for(pos = 0; pos < tokens.size(); pos++) {
 
-        Token first = currentLine.getFirst();
+      switch (getCurrent().type) {
 
-        switch (first.type) {
+        case KEYWORD -> {
 
-          case KEYWORD -> {
+          switch (getCurrent().value) {
 
-            switch (first.value) {
+            case "class" -> {
 
-              case "class" -> {
+              if(indent != 0) {
 
-                if (indent != 0) {
-
-                  System.err.println("Sorry but you can't define classes inside methods or other classes");
-                  System.exit(0);
-
-                } else {
-
-                  JsonArray clazz = new JsonArray();
-
-
-                }
+                System.err.println("Sorry but classes can't be initialized inside of methods...");
+                System.exit(0);
 
               }
+
+              String name = "";
+
+              consumeToken();
+
+              if(getCurrent().type != TokenType.NAME) {
+
+                System.err.println("Sorry but classes require a name...");
+                System.exit(0);
+
+              }
+
+              name = getCurrent().value;
+
+              indent++;
+
+              result.add(name, new JsonObject());
+
+              currentPath = "class/" + name;
+
+            }
+
+            case "func" -> {
+
+              if(currentPath.startsWith("func/")) {
+
+                System.err.println("Sorry but functions cannot be initialized within functions...");
+                System.exit(0);
+
+              }
+
+              String[] path = currentPath.split(".");
+              if(path.length == 2) {
+
+                System.err.println("Sorry but functions cannot be initialized within functions...");
+                System.exit(0);
+
+              }
+
+              consumeToken();
+
+              if(getCurrent().type != TokenType.NAME) {
+
+                System.err.println("Sorry but classes require a name...");
+                System.exit(0);
+
+              }
+
+              String name = getCurrent().value;
+
+              if(path.length == 0) {
+
+                result.add(name, new JsonObject());
+                currentPath = "func/" + name;
+                indent++;
+
+              } else {
+
+                result.getAsJsonObject(currentPath.replace("class/", "")).add(name, new JsonObject());
+                currentPath += ".func/" + name;
+                indent++;
+
+              }
+
+              
 
             }
 
@@ -76,13 +130,9 @@ public class AST {
 
         }
 
-      } else {
-
-        currentLine.add(token);
-
       }
 
-    });
+    }
 
     return result;
 

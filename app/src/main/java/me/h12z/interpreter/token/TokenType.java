@@ -14,6 +14,7 @@ public enum TokenType {
   SEMI,
   STRING,
   CHAR,
-  SET
+  SET,
+  COMMA
   
 }

@@ -15,7 +15,7 @@ public class Tokenizer {
   public static List<Token> tokenizeString(String input) {
     List<Token> tokens = new ArrayList<>();
 
-    Pattern pattern = Pattern.compile("(\\\".*\\\")|(\\\'.*\\\')|(\\bint|char|float|string|boolean|class|func|return|while|if|else|ifnot|break|continue|end\\b)|(([a-zA-Z_][a-zA-Z0-9_]*)\\s*\\()|(\\b([a-zA-Z_][a-zA-Z0-9_]*)\\b)|(\\(|\\)|\\[|\\])|([+\\-*\\/])|(==|<=|>=|!=)|(\\=)|(\\d+\\.\\d+)|(\\d+)|(\\s*\\;\\s*)|(\\s*\\.\\s*)");
+    Pattern pattern = Pattern.compile("(\\\".*\\\")|(\\\'.*\\\')|(\\bint|char|float|string|boolean|class|func|return|while|if|else|ifnot|break|continue|end\\b)|(([a-zA-Z_][a-zA-Z0-9_]*)\\s*\\()|(\\b([a-zA-Z_][a-zA-Z0-9_]*)\\b)|(\\(|\\)|\\[|\\])|([+\\-*\\/])|(==|<=|>=|!=)|(\\=)|(\\d+\\.\\d+)|(\\d+)|(\\s*\\;\\s*)|(\\s*\\.\\s*)|(/s*\\,/s*)");
 
     Matcher matcher = pattern.matcher(input);
 
@@ -61,6 +61,9 @@ public class Tokenizer {
       } else if (matcher.group(14) != null) {
         // Match SEMI
         tokens.add(new Token(matcher.group(14), TokenType.SEMI));
+      } else if (matcher.group(16) != null) {
+        // Match SEMI
+        tokens.add(new Token(matcher.group(14), TokenType.COMMA));
       }
 
     }

@@ -13,8 +13,9 @@
       "program": "java",
       "args": [
         "-cp",
-        "app/build/libs/app.jar",
-        "me.h12z.Main"
+        "app/build/libs/app-all.jar",
+        "me.h12z.Main",
+        "test.hz"
       ],
     },
     {

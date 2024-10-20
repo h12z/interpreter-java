@@ -13,6 +13,7 @@ public class AST {
 
   private static List<Token> tokens = null;
   private static int pos = 0;
+  private static final JsonObject result = new JsonObject();
 
   private static Token getCurrent() {
 
@@ -29,8 +30,6 @@ public class AST {
   public static JsonObject toAST(List<Token> _tokens) {
 
     tokens = _tokens;
-
-    JsonObject result = new JsonObject();
 
     int indent = 0;
 
@@ -53,7 +52,7 @@ public class AST {
 
               }
 
-              String name = "";
+              String name;
 
               consumeToken();
 
@@ -77,20 +76,13 @@ public class AST {
 
               result.getAsJsonArray("mainFile").add(clazz);
 
-              currentPath = "class/" + name;
+              currentPath = Integer.toString(result.getAsJsonArray("mainFile").size() - 1);
 
             }
 
             case "func" -> {
 
-              if (currentPath.startsWith("func/")) {
-
-                System.err.println("Sorry but functions cannot be initialized within functions...");
-                System.exit(0);
-
-              }
-
-              String[] path = currentPath.split(".");
+              String[] path = currentPath.split("\\.");
               if (path.length == 2) {
 
                 System.err.println("Sorry but functions cannot be initialized within functions...");
@@ -166,24 +158,14 @@ public class AST {
 
                 result.getAsJsonArray("mainFile").add(func);
 
-                currentPath = "func/" + name;
+                currentPath = Integer.toString(result.getAsJsonArray("mainFile").size() - 1);
 
               } else {
 
-                String classname = currentPath.replace("class/", "");
-
-                int index = 0;
-
-                for (int i = 0; i < result.getAsJsonArray("mainFile").size(); i++) {
-
-                  JsonObject element = result.getAsJsonArray("mainFile").get(i).getAsJsonObject();
-                  if (element.get("type").getAsString().equals("class") &&
-                          element.get("name").getAsString().equals(classname)) index = i;
-
-                }
+                int index = Integer.parseInt(currentPath.split("\\.")[0]);
 
                 result.getAsJsonArray("mainFile").get(index).getAsJsonArray().add(func);
-                currentPath += ".func/" + name;
+                currentPath += "." + result.getAsJsonArray("mainFile").get(index).getAsJsonArray().size();
 
               }
 
@@ -191,75 +173,130 @@ public class AST {
 
             }
 
-            case "int" -> {
+            case "int", "float", "char", "string", "boolean" -> {
+
+              String vartype = getCurrent().value;
 
               consumeToken();
 
               if (!getCurrent().type.equals(TokenType.NAME)) {
-
                 System.err.println("Sorry but variables have to be assigned names...");
                 System.exit(0);
-
               }
 
               String name = getCurrent().value;
-
               String value = "";
 
               consumeToken();
 
               if (getCurrent().type.equals(TokenType.SET)) {
-
                 consumeToken();
-
-                while (getCurrent().type.equals(TokenType.SEMI)) {
-
+                while (!getCurrent().type.equals(TokenType.SEMI)) {
                   value += getCurrent().value;
-
                 }
-
                 consumeToken();
-
               } else {
-
                 consumeToken();
-
               }
 
               JsonObject integer = new JsonObject();
 
               integer.addProperty("name", name);
-              integer.addProperty("type", "int");
+              integer.addProperty("type", vartype);
               integer.addProperty("value", value);
 
-              String[] path = currentPath.split(".");
+              String[] path = currentPath.split("\\.");
 
-              JsonObject last = integer;
+              JsonArray all;
+
+              JsonArray current = result.getAsJsonArray("mainFile");
+
+              for (int j = 0; j < path.length; j++) {
+
+                current = current.get(Integer.parseInt(path[j])).getAsJsonArray();
+
+              }
+
+              current.add(integer);
+
+              all = current;
 
               for (int i = path.length - 1; i > 0; i--) {
 
-                String pathstr = path[i];
+                current = result.getAsJsonArray("mainFile");
 
-                JsonArray current = result.getAsJsonArray("mainFile");
+                for (int j = 0; j < path.length - i - 1; j++) {
 
-                for (int j = 0; j < path.length - i; j++) {
-
-                  for (int f = 0; f < current.size(); f++) {
-
-                    JsonObject currentobj = current.get(f).getAsJsonObject();
-
-                    if (currentobj.get("type").getAsString().equals(path[j].split("/")[0]) &&
-                            currentobj.get("name").getAsString().equals(path[j].split("/")[1])) {
-
-                      current = currentobj.getAsJsonArray("content");
-
-                    }
-
-                  }
+                  current = current.get(Integer.parseInt(path[j])).getAsJsonArray();
 
                 }
 
+                current.set(i, all);
+
+                all = current;
+
               }
+
+              System.out.println(current);
+
+              result.remove("mainFile");
+              result.add("mainFile", all);
+
+            }
+
+            case "break" -> {
+
+              String value = "";
+
+              consumeToken();
+              while (!getCurrent().type.equals(TokenType.SEMI)) {
+                value += getCurrent().value;
+              }
+
+              consumeToken();
+
+              JsonObject _return = new JsonObject();
+
+              _return.addProperty("type", "return");
+              _return.addProperty("name", "return");
+              _return.addProperty("value", value);
+
+              String[] path = currentPath.split("\\.");
+
+              JsonArray all;
+
+              JsonArray current = result.getAsJsonArray("mainFile");
+
+              for (int j = 0; j < path.length; j++) {
+
+                current = current.get(Integer.parseInt(path[j])).getAsJsonArray();
+
+              }
+
+              current.add(_return);
+
+              all = current;
+
+              for (int i = path.length - 1; i > 0; i--) {
+
+                current = result.getAsJsonArray("mainFile");
+
+                for (int j = 0; j < path.length - i - 1; j++) {
+
+                  current = current.get(Integer.parseInt(path[j])).getAsJsonArray();
+
+                }
+
+                current.set(i, all);
+
+                all = current;
+
+              }
+
+              System.out.println(current);
+
+              result.remove("mainFile");
+              result.add("mainFile", all);
 
             }
 
